@@ -6,7 +6,7 @@ var server = http.createServer(function(req,res){
 	//读取本地html资源返回给客户端
 	res.end(fs.readFileSync(__dirname+"/index.html"));
 });
-//侦听3000端口
+//侦听3000端口,
 server.listen(3000);
 //将socketio绑定到server；
 var io = socketio.listen(server);
