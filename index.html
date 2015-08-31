@@ -9,8 +9,8 @@
             iosocket.on('connect', function () {
                 $('#incomingChatMessages').append($('<li>Connected</li>'));
                 //接收message消息            
-                iosocket.on('message', function(message) {
-                    $('#incomingChatMessages').append($('<li></li>').text(message));
+                iosocket.on('message', function(user,message) {
+                    $('#incomingChatMessages').append($('<li></li>').text(user+" : "+message));
                 });        
             });
             //发送消息
@@ -19,8 +19,12 @@
                     event.preventDefault();
                     //使用websocket的send方法发送数据，也可以使用socketio的emit方式发送一个事件
                     //iosocket.emit('message',message); message是需要发送的内容
-                    iosocket.send($('#outgoingChatMessage').val());
-                    $('#incomingChatMessages').append($('<li></li>').text($('#outgoingChatMessage').val()));
+               //     iosocket.send($('#outgoingChatMessage').val());
+                    iosocket.emit("message",$('#toWhere').val(),$('#outgoingChatMessage').val());
+                    var url = window.location.href;
+                    var split = url.split('/');
+                    var user_name = split[split.length-1];
+                    $('#incomingChatMessages').append($('<li></li>').text(user_name+" : "+$('#outgoingChatMessage').val()));
                     $('#outgoingChatMessage').val('');
                 }
             });
@@ -30,6 +34,9 @@
 <body>
 Incoming Chat:&nbsp;<ul id="incomingChatMessages"></ul>
 <br />
+<span>发送至：</span>
+<input type="text" id="toWhere">
+</br>
 <input type="text" id="outgoingChatMessage">
 </body>
 </html>

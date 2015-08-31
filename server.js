@@ -10,23 +10,29 @@ var server = http.createServer(function(req,res){
 server.listen(3000);
 //将socketio绑定到server；
 var io = socketio.listen(server);
+//用Hash存放name-socket键值对
+var users = new Object();
 //开始侦听
 io.on('connect',function(socket){
 
 	var url = socket.request.headers.referer;
 	var splits = url.split('/');
-	//通过url得到房间号
-	var roomId = splits[splits.length-1];
-
-	//将当前socket放进对应的room中
-	socket.join(roomId);
 	
-	//监听客户端的say事件
-	socket.on("message",function(msg){
-	//	socket.emit("message",msg);
-		console.log(msg);
-		//向本房间的其他用户广播
-		socket.to(roomId).emit('message',msg);
+	//通过url得到用户名
+	var name = splits[splits.length-1];
+	//将昵称和对应的socket放在hash表中
+	users[name] = socket;
+
+	//监听客户端的message事件
+	socket.on("message",function(user,msg){
+	
+		console.log("message form "+name+" to "+user+" :"+msg);
+		//通过传递过来的user值，在users hash里面找到对应的socket对象
+		for(var user_name in users){
+			console.log(user_name);
+			if(user_name == user)
+				users[user].emit("message",name,msg);
+		}
 	});
 
 });
